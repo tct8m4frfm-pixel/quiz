@@ -1,1 +1,1341 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>كم تعرفني؟</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap');
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family:'Cairo',sans-serif;
+    min-height:100vh;
+    background:#f5f0ea;
+    color:#46372f;
+}
+
+button,input{
+    font-family:inherit;
+}
+
+.page{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:22px;
+}
+
+.card{
+    width:100%;
+    max-width:620px;
+    background:#fffaf6;
+    border:1px solid #e5d8cc;
+    border-radius:28px;
+    padding:30px 24px;
+    box-shadow:0 15px 45px rgba(70,50,35,.10);
+}
+
+.hidden{
+    display:none!important;
+}
+
+.logo{
+    text-align:center;
+    color:#8a6a55;
+    font-weight:800;
+    margin-bottom:24px;
+}
+
+h1{
+    text-align:center;
+    font-size:30px;
+    color:#49382e;
+    margin-bottom:10px;
+}
+
+.subtitle{
+    text-align:center;
+    color:#89786c;
+    line-height:1.9;
+    margin-bottom:25px;
+}
+
+label{
+    display:block;
+    font-weight:700;
+    margin-bottom:8px;
+}
+
+input[type="text"]{
+    width:100%;
+    padding:14px;
+    border:1px solid #ddcec1;
+    border-radius:14px;
+    background:white;
+    outline:none;
+    font-size:15px;
+    margin-bottom:15px;
+}
+
+input[type="text"]:focus{
+    border-color:#8a6a55;
+}
+
+.btn{
+    width:100%;
+    border:0;
+    border-radius:15px;
+    padding:14px;
+    background:#705342;
+    color:white;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    margin-top:9px;
+}
+
+.btn.secondary{
+    background:#eee3d9;
+    color:#5c493d;
+}
+
+.btn.danger{
+    background:#ead8d2;
+    color:#70483f;
+}
+
+.back{
+    background:none;
+    border:0;
+    color:#806b5d;
+    cursor:pointer;
+    margin-bottom:15px;
+    font-size:14px;
+}
+
+.question-builder{
+    border:1px solid #e2d5ca;
+    background:#fffdfb;
+    border-radius:19px;
+    padding:18px;
+    margin-bottom:16px;
+}
+
+.builder-title{
+    font-weight:800;
+    margin-bottom:12px;
+}
+
+.question-builder input[type="text"]{
+    margin-bottom:10px;
+}
+
+.options-title{
+    color:#806d60;
+    font-size:13px;
+    margin:7px 0 10px;
+}
+
+.option-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:9px;
+}
+
+.option-row input[type="radio"]{
+    width:18px;
+    height:18px;
+    accent-color:#705342;
+    flex:none;
+}
+
+.option-row input[type="text"]{
+    margin:0;
+    flex:1;
+}
+
+.remove-option{
+    width:38px;
+    height:43px;
+    border:0;
+    border-radius:12px;
+    background:#ead8d2;
+    color:#70483f;
+    cursor:pointer;
+    font-size:18px;
+}
+
+.hint{
+    background:#f1e8df;
+    border-radius:14px;
+    padding:12px;
+    font-size:13px;
+    line-height:1.8;
+    color:#705f53;
+    margin:12px 0;
+}
+
+.play-question{
+    background:#f8f2ec;
+    border:1px solid #e8dcd1;
+    border-radius:19px;
+    padding:18px;
+    margin-bottom:17px;
+}
+
+.question-number{
+    color:#9a806d;
+    font-size:13px;
+    margin-bottom:7px;
+}
+
+.question-text{
+    font-weight:800;
+    font-size:18px;
+    line-height:1.7;
+    margin-bottom:13px;
+}
+
+.answer{
+    width:100%;
+    border:1px solid #dfd1c5;
+    background:white;
+    border-radius:13px;
+    padding:13px;
+    text-align:right;
+    margin-top:8px;
+    cursor:pointer;
+    color:#49382f;
+    font-size:15px;
+}
+
+.answer.selected{
+    border-color:#705342;
+    background:#eee3d9;
+}
+
+.share-link{
+    background:#f3ebe4;
+    border-radius:15px;
+    padding:15px;
+    word-break:break-all;
+    font-size:13px;
+    line-height:1.8;
+    margin:18px 0;
+}
+
+.result-score{
+    text-align:center;
+    font-size:48px;
+    font-weight:800;
+    color:#705342;
+    margin:15px 0;
+}
+
+.result-message{
+    text-align:center;
+    color:#77675d;
+    line-height:1.8;
+    margin-bottom:20px;
+}
+
+.result-item{
+    background:#f8f2ec;
+    border:1px solid #e6d9ce;
+    border-radius:16px;
+    padding:15px;
+    margin-bottom:10px;
+}
+
+.loading{
+    text-align:center;
+    color:#806d60;
+    padding:25px;
+}
+
+.empty{
+    text-align:center;
+    background:#f3ebe4;
+    border-radius:15px;
+    padding:18px;
+    color:#77675d;
+    line-height:1.8;
+}
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+<!-- HOME -->
+<section id="home" class="card">
+
+    <div class="logo">كم تعرفني؟</div>
+
+    <h1>اختبر معرفتك بي</h1>
+
+    <p class="subtitle">
+        أنشئ اختبارك الخاص، اكتب أسئلتك، ثم شارك الرابط مع أصدقائك.
+    </p>
+
+    <button class="btn" onclick="showCreate()">
+        إنشاء اختبار
+    </button>
+
+    <button class="btn secondary" onclick="showJoin()">
+        لدي رابط اختبار
+    </button>
+
+</section>
+
+
+<!-- CREATE -->
+<section id="create" class="card hidden">
+
+    <button class="back" onclick="goHome()">رجوع</button>
+
+    <h1>إنشاء اختبار</h1>
+
+    <p class="subtitle">
+        اكتب أسئلتك واختر الإجابة الصحيحة من الخيارات.
+    </p>
+
+    <label>اسمك</label>
+
+    <input
+        type="text"
+        id="creatorName"
+        placeholder="اكتب اسمك"
+    >
+
+    <div id="questions"></div>
+
+    <button class="btn secondary" onclick="addQuestion()">
+        + إضافة سؤال
+    </button>
+
+    <button class="btn" onclick="createQuiz()">
+        إنشاء الاختبار
+    </button>
+
+</section>
+
+
+<!-- SHARE -->
+<section id="share" class="card hidden">
+
+    <h1>اختبارك جاهز</h1>
+
+    <p class="subtitle">
+        هذا هو الرابط الذي ترسله لأصدقائك.
+    </p>
+
+    <div id="shareLink" class="share-link"></div>
+
+    <button class="btn" onclick="copyLink()">
+        نسخ الرابط
+    </button>
+
+    <button class="btn secondary" onclick="viewMyResults()">
+        مشاهدة النتائج
+    </button>
+
+    <button class="btn secondary" onclick="goHome()">
+        إنشاء اختبار آخر
+    </button>
+
+</section>
+
+
+<!-- JOIN -->
+<section id="join" class="card hidden">
+
+    <button class="back" onclick="goHome()">رجوع</button>
+
+    <h1>فتح اختبار</h1>
+
+    <p class="subtitle">
+        الصق رابط الاختبار الذي وصلك.
+    </p>
+
+    <input
+        type="text"
+        id="quizLink"
+        placeholder="الصق الرابط هنا"
+    >
+
+    <button class="btn" onclick="openQuizFromInput()">
+        فتح الاختبار
+    </button>
+
+</section>
+
+
+<!-- PLAY -->
+<section id="play" class="card hidden">
+
+    <div id="loading" class="loading">
+        جاري تحميل الاختبار...
+    </div>
+
+    <div id="quizContent" class="hidden">
+
+        <h1 id="playTitle"></h1>
+
+        <p class="subtitle">
+            جاوب عن الأسئلة ثم شاهد نتيجتك.
+        </p>
+
+        <label>اسمك</label>
+
+        <input
+            type="text"
+            id="playerName"
+            placeholder="اكتب اسمك"
+        >
+
+        <div id="playQuestions"></div>
+
+        <button class="btn" onclick="submitQuiz()">
+            إنهاء الاختبار
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- RESULT -->
+<section id="result" class="card hidden">
+
+    <h1>انتهى الاختبار</h1>
+
+    <p id="resultText" class="subtitle"></p>
+
+    <div id="score" class="result-score"></div>
+
+    <p id="resultMessage" class="result-message"></p>
+
+    <button class="btn" onclick="goHome()">
+        الرئيسية
+    </button>
+
+</section>
+
+
+<!-- RESULTS -->
+<section id="myResults" class="card hidden">
+
+    <h1>نتائج اختبارك</h1>
+
+    <p class="subtitle">
+        هنا تظهر نتائج الأشخاص الذين اختبروا أنفسهم.
+    </p>
+
+    <div id="resultsList"></div>
+
+    <button class="btn secondary" onclick="showSection('share')">
+        رجوع
+    </button>
+
+</section>
+
+</div>
+
+
+<script>
+
+/* =================================
+   SUPABASE
+================================= */
+
+const SUPABASE_URL =
+"https://frikcmtzrgabjiuqekan.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_-qlwQVy_rOOzPXJQqmAB3w_tfmvUTy2";
+
+const supabaseClient =
+supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+
+/* =================================
+   VARIABLES
+================================= */
+
+let currentQuiz = null;
+let currentQuizCode = null;
+let createdQuizCode = null;
+
+
+/* =================================
+   AUTH
+================================= */
+
+async function ensureAnonymousLogin(){
+
+    const {
+        data: { session }
+    } = await supabaseClient.auth.getSession();
+
+    if(session){
+        return session;
+    }
+
+    const { data, error } =
+        await supabaseClient.auth.signInAnonymously();
+
+    if(error){
+        console.error(error);
+        throw error;
+    }
+
+    return data.session;
+}
+
+
+/* =================================
+   NAVIGATION
+================================= */
+
+function showSection(id){
+
+    document
+        .querySelectorAll(".card")
+        .forEach(card => {
+            card.classList.add("hidden");
+        });
+
+    document
+        .getElementById(id)
+        .classList.remove("hidden");
+}
+
+function goHome(){
+    showSection("home");
+}
+
+function showCreate(){
+
+    showSection("create");
+
+    if(
+        document
+        .getElementById("questions")
+        .children.length === 0
+    ){
+        addQuestion();
+    }
+}
+
+function showJoin(){
+    showSection("join");
+}
+
+
+/* =================================
+   QUESTION BUILDER
+================================= */
+
+function addQuestion(){
+
+    const container =
+        document.getElementById("questions");
+
+    const number =
+        container.children.length + 1;
+
+    const box =
+        document.createElement("div");
+
+    box.className = "question-builder";
+
+    box.innerHTML = `
+
+        <div class="builder-title">
+            السؤال ${number}
+        </div>
+
+        <input
+            type="text"
+            class="q-text"
+            placeholder="اكتب السؤال هنا"
+        >
+
+        <div class="options-title">
+            الخيارات — اضغط الدائرة بجانب الإجابة الصحيحة
+        </div>
+
+        <div class="options">
+
+            ${createOptionHTML(number,1)}
+
+            ${createOptionHTML(number,2)}
+
+        </div>
+
+        <button
+            class="btn secondary"
+            onclick="addOption(this)">
+            + إضافة إجابة
+        </button>
+
+        <button
+            class="btn danger"
+            onclick="
+                this.closest('.question-builder').remove();
+                renumberQuestions();
+            ">
+            حذف السؤال
+        </button>
+    `;
+
+    container.appendChild(box);
+}
+
+
+function createOptionHTML(questionNumber){
+
+    return `
+        <div class="option-row">
+
+            <input
+                type="radio"
+                class="correct-radio"
+                name="correct-${questionNumber}"
+            >
+
+            <input
+                type="text"
+                class="option"
+                placeholder="اكتب الإجابة"
+            >
+
+            <button
+                class="remove-option"
+                onclick="this.parentElement.remove()">
+                ×
+            </button>
+
+        </div>
+    `;
+}
+
+
+function addOption(button){
+
+    const questionBox =
+        button.closest(".question-builder");
+
+    const options =
+        questionBox.querySelector(".options");
+
+    const questionNumber =
+        [...document.querySelectorAll(".question-builder")]
+        .indexOf(questionBox) + 1;
+
+    const row =
+        document.createElement("div");
+
+    row.className = "option-row";
+
+    row.innerHTML = createOptionHTML(questionNumber);
+
+    options.appendChild(row);
+}
+
+
+function renumberQuestions(){
+
+    document
+        .querySelectorAll(".question-builder")
+        .forEach((box,index)=>{
+
+            box.querySelector(".builder-title")
+                .textContent =
+                `السؤال ${index + 1}`;
+
+            box
+                .querySelectorAll(".correct-radio")
+                .forEach(radio => {
+                    radio.name =
+                        `correct-${index + 1}`;
+                });
+        });
+}
+
+
+/* =================================
+   CREATE QUIZ
+================================= */
+
+function generateCode(){
+
+    return Math.random()
+        .toString(36)
+        .substring(2,8)
+        .toUpperCase();
+}
+
+
+async function createQuiz(){
+
+    try{
+
+        await ensureAnonymousLogin();
+
+    }catch(error){
+
+        alert(
+            "لم يتم تشغيل تسجيل الدخول المجهول في Supabase."
+        );
+
+        return;
+    }
+
+    const creator =
+        document
+        .getElementById("creatorName")
+        .value
+        .trim();
+
+    if(!creator){
+
+        alert("اكتب اسمك أولاً.");
+
+        return;
+    }
+
+    const boxes =
+        document
+        .querySelectorAll(".question-builder");
+
+    if(boxes.length === 0){
+
+        alert("أضف سؤالًا واحدًا على الأقل.");
+
+        return;
+    }
+
+    const questions = [];
+
+    for(let i = 0; i < boxes.length; i++){
+
+        const box = boxes[i];
+
+        const question =
+            box
+            .querySelector(".q-text")
+            .value
+            .trim();
+
+        const optionInputs =
+            [
+                ...box.querySelectorAll(".option")
+            ];
+
+        const options =
+            optionInputs
+            .map(input => input.value.trim())
+            .filter(Boolean);
+
+        const radios =
+            [
+                ...box.querySelectorAll(".correct-radio")
+            ];
+
+        const correctIndex =
+            radios.findIndex(radio => radio.checked);
+
+        if(!question){
+
+            alert(`اكتب السؤال رقم ${i + 1}.`);
+
+            return;
+        }
+
+        if(options.length < 2){
+
+            alert(
+                `السؤال ${i + 1} يحتاج خيارين على الأقل.`
+            );
+
+            return;
+        }
+
+        if(correctIndex === -1){
+
+            alert(
+                `اختر الإجابة الصحيحة للسؤال ${i + 1}.`
+            );
+
+            return;
+        }
+
+        const correct =
+            optionInputs[correctIndex]
+            .value
+            .trim();
+
+        questions.push({
+            question:question,
+            options:options,
+            correct:correct
+        });
+    }
+
+    const {
+        data: { user }
+    } = await supabaseClient.auth.getUser();
+
+    if(!user){
+
+        alert("لم يتم التعرف على المستخدم.");
+
+        return;
+    }
+
+    const code = generateCode();
+
+    const {
+        error
+    } =
+        await supabaseClient
+        .from("quizzes")
+        .insert({
+            code:code,
+            creator_name:creator,
+            questions:questions,
+            owner_id:user.id
+        });
+
+    if(error){
+
+        console.error(error);
+
+        alert(
+            "حدث خطأ أثناء إنشاء الاختبار:\n" +
+            error.message
+        );
+
+        return;
+    }
+
+    createdQuizCode = code;
+
+    const link =
+        window.location.origin +
+        window.location.pathname +
+        "?quiz=" +
+        encodeURIComponent(code);
+
+    document
+        .getElementById("shareLink")
+        .textContent = link;
+
+    showSection("share");
+}
+
+
+/* =================================
+   COPY
+================================= */
+
+async function copyLink(){
+
+    const link =
+        document
+        .getElementById("shareLink")
+        .textContent;
+
+    try{
+
+        await navigator.clipboard.writeText(link);
+
+        alert("تم نسخ الرابط.");
+
+    }catch{
+
+        alert(
+            "يمكنك الضغط مطولًا على الرابط ونسخه يدويًا."
+        );
+    }
+}
+
+
+/* =================================
+   OPEN QUIZ
+================================= */
+
+function openQuizFromInput(){
+
+    const value =
+        document
+        .getElementById("quizLink")
+        .value
+        .trim();
+
+    if(!value){
+
+        alert("الصق رابط الاختبار.");
+
+        return;
+    }
+
+    try{
+
+        const url =
+            new URL(value);
+
+        const code =
+            url.searchParams.get("quiz");
+
+        if(!code){
+
+            alert("الرابط غير صحيح.");
+
+            return;
+        }
+
+        loadQuiz(code);
+
+    }catch{
+
+        alert("الرابط غير صحيح.");
+    }
+}
+
+
+async function loadQuiz(code){
+
+    showSection("play");
+
+    document
+        .getElementById("loading")
+        .classList.remove("hidden");
+
+    document
+        .getElementById("quizContent")
+        .classList.add("hidden");
+
+    try{
+
+        await ensureAnonymousLogin();
+
+    }catch{
+
+        document
+            .getElementById("loading")
+            .textContent =
+            "تعذر الاتصال بالموقع.";
+
+        return;
+    }
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+        .from("quizzes")
+        .select("*")
+        .eq("code",code)
+        .single();
+
+    if(error || !data){
+
+        document
+            .getElementById("loading")
+            .textContent =
+            "لم يتم العثور على هذا الاختبار.";
+
+        return;
+    }
+
+    currentQuiz = data;
+    currentQuizCode = code;
+
+    document
+        .getElementById("loading")
+        .classList.add("hidden");
+
+    document
+        .getElementById("quizContent")
+        .classList.remove("hidden");
+
+    document
+        .getElementById("playTitle")
+        .textContent =
+        `اختبار ${data.creator_name}`;
+
+    renderQuestions(data.questions);
+}
+
+
+/* =================================
+   PLAY QUESTIONS
+================================= */
+
+function renderQuestions(questions){
+
+    const container =
+        document
+        .getElementById("playQuestions");
+
+    container.innerHTML = "";
+
+    questions.forEach((q,index)=>{
+
+        const box =
+            document.createElement("div");
+
+        box.className = "play-question";
+
+        let answers = "";
+
+        q.options.forEach(option => {
+
+            answers += `
+                <button
+                    class="answer"
+                    data-answer="${escapeHtml(option)}"
+                    onclick="selectAnswer(this)">
+                    ${escapeHtml(option)}
+                </button>
+            `;
+
+        });
+
+        box.innerHTML = `
+
+            <div class="question-number">
+                السؤال ${index + 1}
+            </div>
+
+            <div class="question-text">
+                ${escapeHtml(q.question)}
+            </div>
+
+            ${answers}
+
+        `;
+
+        container.appendChild(box);
+    });
+}
+
+
+function selectAnswer(button){
+
+    const parent =
+        button.parentElement;
+
+    parent
+        .querySelectorAll(".answer")
+        .forEach(btn => {
+            btn.classList.remove("selected");
+        });
+
+    button.classList.add("selected");
+}
+
+
+/* =================================
+   SUBMIT
+================================= */
+
+async function submitQuiz(){
+
+    if(!currentQuiz){
+        return;
+    }
+
+    const player =
+        document
+        .getElementById("playerName")
+        .value
+        .trim();
+
+    if(!player){
+
+        alert("اكتب اسمك أولاً.");
+
+        return;
+    }
+
+    const boxes =
+        document
+        .querySelectorAll(".play-question");
+
+    let score = 0;
+
+    boxes.forEach((box,index)=>{
+
+        const selected =
+            box.querySelector(".answer.selected");
+
+        if(!selected){
+            return;
+        }
+
+        const answer =
+            selected.dataset.answer;
+
+        const correct =
+            currentQuiz.questions[index].correct;
+
+        if(answer === correct){
+            score++;
+        }
+    });
+
+    const total =
+        currentQuiz.questions.length;
+
+    const { error } =
+        await supabaseClient
+        .from("results")
+        .insert({
+            quiz_code:currentQuizCode,
+            player_name:player,
+            score:score,
+            total:total
+        });
+
+    if(error){
+
+        console.error(error);
+
+        alert(
+            "حدث خطأ أثناء حفظ النتيجة:\n" +
+            error.message
+        );
+
+        return;
+    }
+
+    showResult(player,score,total);
+}
+
+
+/* =================================
+   RESULT
+================================= */
+
+function showResult(player,score,total){
+
+    document
+        .getElementById("resultText")
+        .textContent =
+        `${player}، نتيجتك هي`;
+
+    document
+        .getElementById("score")
+        .textContent =
+        `${score} / ${total}`;
+
+    const percentage =
+        (score / total) * 100;
+
+    let message;
+
+    if(percentage === 100){
+
+        message =
+        "تعرفه بشكل ممتاز.";
+
+    }else if(percentage >= 70){
+
+        message =
+        "نتيجة جميلة، يبدو أنك تعرفه جيدًا.";
+
+    }else if(percentage >= 40){
+
+        message =
+        "نتيجة متوسطة، تحتاج تعرف عنه أكثر.";
+
+    }else{
+
+        message =
+        "يبدو أن عندك أشياء كثيرة تكتشفها عنه.";
+
+    }
+
+    document
+        .getElementById("resultMessage")
+        .textContent = message;
+
+    showSection("result");
+}
+
+
+/* =================================
+   MY RESULTS
+================================= */
+
+async function viewMyResults(){
+
+    if(!createdQuizCode){
+
+        alert("لا يوجد اختبار منشأ حاليًا.");
+
+        return;
+    }
+
+    showSection("myResults");
+
+    const container =
+        document
+        .getElementById("resultsList");
+
+    container.innerHTML =
+        '<div class="loading">جاري تحميل النتائج...</div>';
+
+    const {
+        data: { user }
+    } =
+        await supabaseClient.auth.getUser();
+
+    if(!user){
+
+        container.innerHTML =
+            '<div class="empty">تعذر التعرف على صاحب الاختبار.</div>';
+
+        return;
+    }
+
+    /*
+       أولًا نتأكد أن الاختبار الحالي
+       يخص المستخدم الموجود على الجهاز.
+    */
+
+    const {
+        data: quiz,
+        error: quizError
+    } =
+        await supabaseClient
+        .from("quizzes")
+        .select("code")
+        .eq("code",createdQuizCode)
+        .eq("owner_id",user.id)
+        .single();
+
+    if(quizError || !quiz){
+
+        container.innerHTML =
+            '<div class="empty">لا يمكن الوصول إلى نتائج هذا الاختبار.</div>';
+
+        return;
+    }
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+        .from("results")
+        .select("*")
+        .eq("quiz_code",createdQuizCode)
+        .order("created_at",{ascending:false});
+
+    if(error){
+
+        container.innerHTML =
+            '<div class="empty">حدث خطأ أثناء تحميل النتائج.</div>';
+
+        return;
+    }
+
+    if(!data || data.length === 0){
+
+        container.innerHTML =
+            '<div class="empty">لم يختبر أحد اختبارك حتى الآن.</div>';
+
+        return;
+    }
+
+    container.innerHTML = "";
+
+    data.forEach(result=>{
+
+        const item =
+            document.createElement("div");
+
+        item.className = "result-item";
+
+        item.innerHTML = `
+            <strong>
+                ${escapeHtml(result.player_name)}
+            </strong>
+
+            <div style="margin-top:6px;color:#806d60;">
+                النتيجة:
+                ${result.score} / ${result.total}
+            </div>
+        `;
+
+        container.appendChild(item);
+    });
+}
+
+
+/* =================================
+   ESCAPE HTML
+================================= */
+
+function escapeHtml(value){
+
+    return String(value)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+}
+
+
+/* =================================
+   AUTO OPEN SHARED QUIZ
+================================= */
+
+window.addEventListener(
+    "DOMContentLoaded",
+    async ()=>{
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+        const code =
+            params.get("quiz");
+
+        if(code){
+
+            loadQuiz(code);
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+</html>
